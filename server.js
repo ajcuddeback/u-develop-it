@@ -45,6 +45,22 @@ app.get('/api/candidates', (req, res) => {
     });
 });
 
+// Get all parties
+app.get('/api/parties', (req, res) => {
+    const sql = `SELECT * FROM parties`;
+    const params = [];
+    db.all(sql, params, (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
+    });
+});
+
 // Get a single candidate
 app.get('/api/candidate/:id', (req, res) => {
     const sql = `SELECT candidates.*, parties.name 
@@ -67,6 +83,22 @@ app.get('/api/candidate/:id', (req, res) => {
     });
 });
 
+// Get a single party
+app.get('/api/party/:id', (req, res) => {
+    const sql = `SELECT * FROM parties WHERE id = ?`;
+    const params = [req.params.id];
+
+    db.get(sql, params, (err, rows) => {
+        if (err) {
+            res.status(400).json({ error: err.message })
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
+    });
+});
+
 
 // Delete a candidate
 app.delete('/api/candidate/:id', (req, res) => {
@@ -78,6 +110,24 @@ app.delete('/api/candidate/:id', (req, res) => {
             res.status(400).json({ error: err.message });
             return;
         }
+        res.json({
+            message: 'success',
+            changes: this.changes
+        });
+    });
+});
+
+// Delete a party
+app.delete('/api/party/:id', (req, res) => {
+    const sql = `DELETE FROM parties WHERE id = ?`;
+    const params = [req.params.id];
+
+    db.run(sql, params, function (err, result) {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+
         res.json({
             message: 'success',
             changes: this.changes
@@ -107,7 +157,32 @@ app.post('/api/candidate', ({ body }, res) => {
             id: this.lastID
         });
     });
-})
+});
+
+app.put('/api/candidate/:id', (req, res) => {
+    const errors = inputCheck(req.body, 'party_id');
+
+    if (errors) {
+        res.status(400).json({ error: errors });
+        return;
+    }
+    const sql = `UPDATE candidates SET party_id = ?
+                    WHERE id = ?`;
+    const params = [req.body.party_id, req.params.id];
+
+    db.run(sql, params, function (err, result) {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+
+        res.json({
+            message: 'success',
+            data: req.body,
+            changes: this.changes
+        });
+    });
+});
 
 
 // Default response for any other request(Not Fount) - Catch all
