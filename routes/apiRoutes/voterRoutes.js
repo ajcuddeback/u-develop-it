@@ -84,4 +84,20 @@ router.put('/voter/:id', (req, res) => {
         });
     });
 });
+
+router.delete('/voter/:id', (req, res) => {
+    const sql = 'DELETE FROM voters WHERE id = ?';
+
+    db.run(sql, req.params.id, function (err, data) {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+
+        res.json({
+            message: 'success',
+            changes: this.changes
+        });
+    });
+});
 module.exports = router;
