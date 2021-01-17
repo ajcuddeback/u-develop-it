@@ -1,7 +1,5 @@
 const db = require('./db/database')
 const express = require('express');
-const inputCheck = require('./utils/inputCheck')
-
 
 const PORT = process.env.PORT || 3001;
 const app = express();
@@ -11,13 +9,6 @@ app.use(express.json());
 
 const apiRoutes = require('./routes/apiRoutes');
 app.use('/api', apiRoutes);
-
-
-app.get('/', (req, res) => {
-    res.json({
-        message: 'Hello World'
-    });
-});
 
 // Default response for any other request(Not Fount) - Catch all
 app.use((req, res) => {
